@@ -3,15 +3,19 @@ package com.demo.webhooks.model;
 import lombok.Data;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import java.util.UUID;
+import java.time.LocalDateTime;
 
 @Data
 @Entity
 public class Event {
 
     @Id
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long eventId;
+    private LocalDateTime eventTime = LocalDateTime.now();
     private String message;
 
 }

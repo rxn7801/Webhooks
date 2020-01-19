@@ -6,6 +6,7 @@ import com.demo.webhooks.repository.SubscriptionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 import static java.time.LocalDateTime.now;
@@ -28,8 +29,14 @@ public class SubscriptionService {
 
     }
 
-    public Optional<Subscription> getSubscription(Long subscriptionId) {
+    Optional<Subscription> getSubscription(Long subscriptionId) {
         return subscriptionRepository.findById(subscriptionId);
 
     }
+
+    public List<Subscription> getSubscriptions() {
+        return (List<Subscription>) subscriptionRepository.findAll();
+    }
+
+
 }

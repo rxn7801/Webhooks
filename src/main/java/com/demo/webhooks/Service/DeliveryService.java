@@ -13,8 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 public class DeliveryService {
@@ -34,22 +32,17 @@ public class DeliveryService {
     }
 
 
-    public String pushMessage(Long subscriptionId, AtomicInteger counter) {
+    public Delivery pushMessage(Event event, Long subscriptionId) {
 
         final Optional<Subscription> subscriptionDetails = subscriptionService.getSubscription(subscriptionId);
 
-        Event newEvent = new Event();
-        newEvent.setId(UUID.randomUUID());
-        newEvent.setMessage("This is test event # " + counter.incrementAndGet());
-
-        HttpEntity<Event> request = new HttpEntity<>(newEvent);
+        HttpEntity<Event> request = new HttpEntity<>(event);
 
         Delivery delivery = new Delivery();
 
         subscriptionDetails.ifPresent(subscription -> {
             final ResponseEntity<Void> response = restTemplate.exchange(subscription.getUrl(), HttpMethod.POST, request, Void.class);
 
-            delivery.setEventId(newEvent.getId());
             if (response.getStatusCodeValue() == 204)
                 delivery.setStatus("Delivered");
             else
@@ -58,7 +51,7 @@ public class DeliveryService {
 
         });
 
-        return "Event posting Status " + delivery.getStatus() + "!";
+        return delivery;
 
     }
 }
