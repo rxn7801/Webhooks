@@ -12,24 +12,28 @@ import java.util.List;
 
 
 @RestController
-@RequestMapping("/")
+@RequestMapping("/webhooks")
 @CrossOrigin
 public class SubscriptionResource {
 
     @Autowired
     private SubscriptionService subscriptionService;
 
-    @PostMapping("webhooks")
+    @PostMapping
     public ResponseEntity<Subscription> createWebHooks
             (@RequestBody SubscriptionRequest subscriptionRequest) {
 
-        return new ResponseEntity<>(subscriptionService.createSubscription(subscriptionRequest),
-                HttpStatus.CREATED);
+        return new ResponseEntity<>(subscriptionService.createSubscription(subscriptionRequest), HttpStatus.CREATED);
     }
 
-    @GetMapping("webhooks")
+    @GetMapping
     public ResponseEntity<List<Subscription>> getWebHooks() {
         return new ResponseEntity<>(subscriptionService.getSubscriptions(), HttpStatus.OK);
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity deleteWebHook(@PathVariable("id") Long subscriptionId) {
+        subscriptionService.deleteSubscription(subscriptionId);
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
+    }
 }

@@ -29,8 +29,8 @@ public class SubscriptionService {
 
     }
 
-    Optional<Subscription> getSubscription(Long subscriptionId) {
-        return subscriptionRepository.findById(subscriptionId);
+    Subscription getSubscription(String name, String level) {
+        return subscriptionRepository.findByNameAndLevel(name, level);
 
     }
 
@@ -39,4 +39,7 @@ public class SubscriptionService {
     }
 
 
+    public void deleteSubscription(Long subscriptionId) {
+        subscriptionRepository.deleteById(subscriptionId);
+    }
 }

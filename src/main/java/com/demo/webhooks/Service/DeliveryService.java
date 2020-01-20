@@ -4,6 +4,8 @@ import com.demo.webhooks.model.Delivery;
 import com.demo.webhooks.model.Event;
 import com.demo.webhooks.model.Subscription;
 import com.demo.webhooks.repository.DeliveryRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpEntity;
@@ -12,10 +14,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Optional;
-
 @Service
 public class DeliveryService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(DeliveryService.class);
 
     @Autowired
     private SubscriptionService subscriptionService;
@@ -32,24 +34,28 @@ public class DeliveryService {
     }
 
 
-    public Delivery pushMessage(Event event, Long subscriptionId) {
+    public Delivery pushMessage(Event event) {
 
-        final Optional<Subscription> subscriptionDetails = subscriptionService.getSubscription(subscriptionId);
+        final Subscription subscription = subscriptionService.getSubscription(event.getSubName(), event.getLevel());
 
         HttpEntity<Event> request = new HttpEntity<>(event);
 
         Delivery delivery = new Delivery();
+        try {
 
-        subscriptionDetails.ifPresent(subscription -> {
             final ResponseEntity<Void> response = restTemplate.exchange(subscription.getUrl(), HttpMethod.POST, request, Void.class);
-
-            if (response.getStatusCodeValue() == 204)
+            LOGGER.info("Pushing notification to Client " + subscription.getUrl() + " with message " + event.getMessage());
+            if (response.getStatusCodeValue() == 204) {
+                LOGGER.info(" Acknowledgement received from Client! ");
                 delivery.setStatus("Delivered");
-            else
+            } else
                 delivery.setStatus("Failed");
-            deliveryRepository.save(delivery);
 
-        });
+        } catch (Exception e) {
+            delivery.setStatus("Failed");
+        }
+        deliveryRepository.save(delivery);
+
 
         return delivery;
 

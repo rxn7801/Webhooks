@@ -16,9 +16,9 @@ public class ClientResource {
     @Autowired
     private DeliveryService deliveryService;
 
-    @PostMapping("push/{id}")
-    public ResponseEntity<Delivery> pushEvent(@RequestBody Event event, @PathVariable("id") Long subscriptionId) {
-        return new ResponseEntity<>(deliveryService.pushMessage(event, subscriptionId), HttpStatus.OK);
+    @PostMapping("push")
+    public ResponseEntity<Delivery> pushEvent(@RequestBody Event event) {
+        return new ResponseEntity<>(deliveryService.pushMessage(event), HttpStatus.OK);
     }
 
 
